@@ -1,0 +1,26 @@
+# Mr. Pop Chiang Mai Motor & Car Rental
+> AI-Powered Scooter, Motorbike, and Car Rental Service in Chiang Mai, Thailand.
+
+## Core Information
+- Location: Chiang Mai, Thailand (Pickup at Nimman, Old City, or CNX Airport)
+- Services: Scooter Rental (125cc-155cc), Big Bikes (300cc-750cc), Cars & SUVs
+- Booking Method: AI Conversational Search, Vision AI ID Verification, PromptPay/Stripe E-Checkout
+- Included: 2 Helmets, Full Insurance Options, Medical Emergency Coverage, Hotel Delivery
+
+## Fleet Summary
+- Honda Click 125cc: 250 THB/day (Lightweight, agile for Old City)
+- Yamaha NMAX 155cc: 350 THB/day (ABS, dual disc, perfect for Doi Suthep)
+- Honda PCX 160cc: 380 THB/day (Comfort cruiser, spacious underseat)
+- Honda CB500X 500cc: 950 THB/day (Adventure tourer for Samoeng Loop / Pai)
+- Toyota Yaris ATIV: 1,100 THB/day (Automatic compact car with Apple CarPlay)
+- Honda CR-V Turbo SUV: 1,850 THB/day (Family 7-seater SUV with AWD)
+
+## Requirements & Deposit
+- Passport or Thai ID required
+- International Driving Permit (IDP) recommended for tourists
+- Security Deposit: 1,000 - 3,000 THB (Cash or Credit Card hold)
+- Helmet Law: Helmets mandatory in Thailand; 2 helmets included free with every bike.
+
+## API & Dynamic Chat Booking
+- Web UI: https://mrpopchiangmai-ai-ui.vercel.app
+- AI Booking Endpoint: /api/chat
