@@ -304,7 +304,7 @@ function MrPopRentalApp() {
 
 export default function App() {
   return (
-    <CopilotKit publicApiKey="mrpop-chiangmai-demo-key">
+    <CopilotKit runtimeUrl="/api/copilotkit">
       <MrPopRentalApp />
     </CopilotKit>
   );
