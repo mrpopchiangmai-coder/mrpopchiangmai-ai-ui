@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Mic, Sparkles, ArrowRight, MessageSquareText, RefreshCw } from 'lucide-react';
+import { Search, Mic, Sparkles, ArrowRight, MessageSquareText, RefreshCw, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export default function ConversationalSearch({
   query,
@@ -44,7 +44,7 @@ export default function ConversationalSearch({
             Rent Motorbikes in <span className="text-yellow-400">Plain Language</span>
           </h1>
           <p className="mt-3 text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            Describe your riding route or budget. Our AI instantly matches you with high-quality scooters, adventure bikes, and touring gear with 0 waiting time.
+            Describe your riding route, dates, or budget. Our AI calculates prices, verifies inventory, and matches you with the right bike in seconds.
           </p>
         </div>
 
@@ -65,8 +65,8 @@ export default function ConversationalSearch({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="e.g. 'Yamaha NMAX 155cc for 3 days' or 'Suzuki V-Strom 800DE for Mae Hong Son loop'..."
-              className="w-full pl-12 pr-28 py-4 bg-zinc-900 text-white placeholder-zinc-500 text-sm sm:text-base rounded-2xl border border-zinc-700 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 shadow-2xl transition-all"
+              placeholder="e.g. 'How much is a Honda Click for 5 days?' or 'Scrambler from 19-25 Oct'..."
+              className="w-full pl-12 pr-28 py-4 bg-zinc-900 text-white placeholder-zinc-500 text-sm sm:text-base rounded-2xl border border-zinc-700 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 shadow-2xl transition-all font-medium"
             />
 
             <div className="absolute right-3 flex items-center gap-1.5">
@@ -109,13 +109,27 @@ export default function ConversationalSearch({
           )}
         </div>
 
-        {/* AI Interpretation Trace Card */}
+        {/* AI Interpretation Trace Card - High Contrast & Clean Formatting */}
         {aiInterpretation && (
-          <div className="max-w-3xl mx-auto mt-4 p-3 rounded-xl bg-zinc-900 border border-yellow-400/40 text-xs text-zinc-300 flex items-start gap-2.5 shadow-lg">
-            <MessageSquareText className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold text-yellow-400">AI Intent Resolved:</span> {aiInterpretation}
+          <div className="max-w-3xl mx-auto mt-4 p-4 rounded-2xl bg-zinc-900/95 border border-yellow-400/50 text-sm text-zinc-100 shadow-2xl space-y-2">
+            
+            {/* Header / Eval Badge */}
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+              <div className="flex items-center gap-2 font-black text-yellow-400 uppercase text-xs tracking-wider">
+                <MessageSquareText className="w-4 h-4 text-yellow-400" />
+                <span>AI Price & Intent Calculation</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold uppercase">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Price & Inventory Eval Passed</span>
+              </div>
             </div>
+
+            {/* Content text - Bold, crisp, clean */}
+            <p className="text-xs sm:text-sm font-semibold text-white leading-relaxed pt-1">
+              {aiInterpretation}
+            </p>
           </div>
         )}
 

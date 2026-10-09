@@ -1,13 +1,9 @@
 /**
- * Enhanced AI Assistant with Date Math & Dynamic Price Calculation
- * Handles:
- *  - Specific vehicle matching ("Honda Click", "Scrambler 400")
- *  - Explicit duration ("for 5 days")
- *  - Date ranges ("from 19-25 Oct" -> 6 days)
- *  - Total price calculation & deposit breakdown
+ * Enhanced AI Assistant with Date Math, Dynamic Price Calculation & Guardrail Evals
  */
 
 import { FLEET_DATA } from '../data/fleet';
+import { evaluateLlmResponse, logTraceToLangfuse } from './eval';
 
 const SYSTEM_PROMPT = `
 You are the AI Price Calculator & Booking Assistant for "Mr. Pop Chiang Mai Motorbike Rental" (est. 1956).
@@ -23,10 +19,10 @@ ${JSON.stringify(FLEET_DATA.map(f => ({
 })), null, 2)}
 
 Your Tasks:
-1. Identify the requested vehicle (e.g. "Honda Click", "Triumph Scrambler 400").
-2. Calculate the total rental days:
-   - If user gives days ("5 days") -> days = 5.
-   - If user gives dates ("19-25 Oct") -> calculate difference (25 - 19 = 6 days).
+1. Identify requested vehicle (e.g. "Honda Click", "Triumph Scrambler 400").
+2. Calculate total rental days:
+   - "5 days" -> days = 5.
+   - "19-25 Oct" -> calculate difference (25 - 19 = 6 days).
 3. Compute total price: (priceThbPerDay * days) THB.
 4. Return JSON response with exact calculation breakdown.
 
@@ -69,8 +65,9 @@ export async function queryFreeTierLlm(userPrompt, apiKey = null) {
     }
   }
 
-  // Ensure days is reasonable
   if (calculatedDays <= 0 || isNaN(calculatedDays)) calculatedDays = 1;
+
+  let rawAiResponse = null;
 
   // --- 2. GROQ FREE-TIER API CALL (If API Key provided) ---
   const GROQ_API_KEY = apiKey || import.meta.env.VITE_GROQ_API_KEY;
@@ -94,57 +91,67 @@ export async function queryFreeTierLlm(userPrompt, apiKey = null) {
       });
 
       const data = await response.json();
-      const result = JSON.parse(data.choices[0].message.content);
-      return {
-        ...result,
-        calculatedDays: result.calculatedDays || calculatedDays
-      };
+      rawAiResponse = JSON.parse(data.choices[0].message.content);
+      rawAiResponse.calculatedDays = rawAiResponse.calculatedDays || calculatedDays;
     } catch (err) {
       console.warn("Groq API fallback to client calculation:", err);
     }
   }
 
-  // --- 3. DETERMINISTIC CLIENT-SIDE VEHICLE & PRICE CALCULATOR ---
-  let matchedVehicle = FLEET_DATA[0]; // Default Click 125
-  let category = 'All';
+  // --- 3. DETERMINISTIC CLIENT-SIDE VEHICLE & PRICE CALCULATOR (Fallback) ---
+  if (!rawAiResponse) {
+    let matchedVehicle = FLEET_DATA[0]; // Default Click 125
+    let category = 'All';
 
-  if (lower.includes('scrambler') || lower.includes('triumph') || lower.includes('400')) {
-    matchedVehicle = FLEET_DATA.find(v => v.id === 'triumph-scrambler-400') || FLEET_DATA[3];
-    category = 'Adventure Bikes';
-  } else if (lower.includes('click') || lower.includes('125')) {
-    matchedVehicle = FLEET_DATA.find(v => v.id === 'honda-click-125') || FLEET_DATA[6];
-    category = 'City Scooters';
-  } else if (lower.includes('nmax') || lower.includes('155')) {
-    matchedVehicle = FLEET_DATA.find(v => v.id === 'yamaha-nmax-155') || FLEET_DATA[4];
-    category = 'Premium Scooters';
-  } else if (lower.includes('v-strom') || lower.includes('vstrom') || lower.includes('800')) {
-    matchedVehicle = FLEET_DATA.find(v => v.id === 'suzuki-vstrom-800de') || FLEET_DATA[0];
-    category = 'Adventure Bikes';
-  } else if (lower.includes('transalp') || lower.includes('750')) {
-    matchedVehicle = FLEET_DATA.find(v => v.id === 'honda-transalp-750') || FLEET_DATA[1];
-    category = 'Adventure Bikes';
-  } else if (lower.includes('ninja') || lower.includes('500')) {
-    matchedVehicle = FLEET_DATA.find(v => v.id === 'kawasaki-ninja-500') || FLEET_DATA[8];
-    category = 'Sports Bikes';
+    if (lower.includes('scrambler') || lower.includes('triumph') || lower.includes('400')) {
+      matchedVehicle = FLEET_DATA.find(v => v.id === 'triumph-scrambler-400') || FLEET_DATA[3];
+      category = 'Adventure Bikes';
+    } else if (lower.includes('click') || lower.includes('125')) {
+      matchedVehicle = FLEET_DATA.find(v => v.id === 'honda-click-125') || FLEET_DATA[6];
+      category = 'City Scooters';
+    } else if (lower.includes('nmax') || lower.includes('155')) {
+      matchedVehicle = FLEET_DATA.find(v => v.id === 'yamaha-nmax-155') || FLEET_DATA[4];
+      category = 'Premium Scooters';
+    } else if (lower.includes('v-strom') || lower.includes('vstrom') || lower.includes('800')) {
+      matchedVehicle = FLEET_DATA.find(v => v.id === 'suzuki-vstrom-800de') || FLEET_DATA[0];
+      category = 'Adventure Bikes';
+    } else if (lower.includes('transalp') || lower.includes('750')) {
+      matchedVehicle = FLEET_DATA.find(v => v.id === 'honda-transalp-750') || FLEET_DATA[1];
+      category = 'Adventure Bikes';
+    } else if (lower.includes('ninja') || lower.includes('500')) {
+      matchedVehicle = FLEET_DATA.find(v => v.id === 'kawasaki-ninja-500') || FLEET_DATA[8];
+      category = 'Sports Bikes';
+    }
+
+    const totalThb = matchedVehicle.priceThb * calculatedDays;
+    const totalUsd = Math.round(matchedVehicle.priceUsd * calculatedDays);
+
+    const intent = `Calculated ${calculatedDays} day${calculatedDays > 1 ? 's' : ''}${dateNote} rental for ${matchedVehicle.name} @ ฿${matchedVehicle.priceThb}/day = ฿${totalThb.toLocaleString()} THB ($${totalUsd} USD).`;
+
+    const reply = `The ${matchedVehicle.name} for ${calculatedDays} day${calculatedDays > 1 ? 's' : ''}${dateNote} is ฿${totalThb.toLocaleString()} THB total (฿${matchedVehicle.priceThb}/day). Refundable deposit is ฿${matchedVehicle.depositThb.toLocaleString()} THB. Includes 2 free helmets & full insurance!`;
+
+    rawAiResponse = {
+      requestedVehicle: matchedVehicle.name,
+      calculatedDays: calculatedDays,
+      dailyRateThb: matchedVehicle.priceThb,
+      totalPriceThb: totalThb,
+      totalPriceUsd: totalUsd,
+      refundableDepositThb: matchedVehicle.depositThb,
+      resolvedIntent: intent,
+      matchedCategory: category,
+      recommendedVehicleIds: [matchedVehicle.id],
+      replyMessage: reply
+    };
   }
 
-  const totalThb = matchedVehicle.priceThb * calculatedDays;
-  const totalUsd = Math.round(matchedVehicle.priceUsd * calculatedDays);
+  // --- 4. RUN EVALS & GUARDRAILS ON RESPONSE ---
+  const { evalResults, sanitizedResponse } = evaluateLlmResponse(userPrompt, rawAiResponse);
 
-  const intent = `Calculated ${calculatedDays} day${calculatedDays > 1 ? 's' : ''}${dateNote} rental for ${matchedVehicle.name} @ ฿${matchedVehicle.priceThb}/day = ฿${totalThb.toLocaleString()} THB ($${totalUsd} USD).`;
-
-  const reply = `The ${matchedVehicle.name} for ${calculatedDays} day${calculatedDays > 1 ? 's' : ''}${dateNote} is ฿${totalThb.toLocaleString()} THB total (฿${matchedVehicle.priceThb}/day). Refundable deposit is ฿${matchedVehicle.depositThb.toLocaleString()} THB. Includes 2 free helmets & full insurance!`;
+  // --- 5. LOG OBSERVABILITY TRACE ---
+  logTraceToLangfuse(userPrompt, sanitizedResponse, evalResults);
 
   return {
-    requestedVehicle: matchedVehicle.name,
-    calculatedDays: calculatedDays,
-    dailyRateThb: matchedVehicle.priceThb,
-    totalPriceThb: totalThb,
-    totalPriceUsd: totalUsd,
-    refundableDepositThb: matchedVehicle.depositThb,
-    resolvedIntent: intent,
-    matchedCategory: category,
-    recommendedVehicleIds: [matchedVehicle.id],
-    replyMessage: reply
+    ...sanitizedResponse,
+    evalResults
   };
 }
