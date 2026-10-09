@@ -1,4 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { CopilotKit, useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { CopilotPopup } from "@copilotkit/react-ui";
+import "@copilotkit/react-ui/styles.css";
+
 import Header from './components/Header';
 import ConversationalSearch from './components/ConversationalSearch';
 import VehicleCard from './components/VehicleCard';
@@ -10,7 +14,7 @@ import { FLEET_DATA } from './data/fleet';
 import { queryFreeTierLlm } from './services/ai';
 import { Sparkles, Bot, ShieldCheck, MapPin, Zap } from 'lucide-react';
 
-export default function App() {
+function MrPopRentalApp() {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [currency, setCurrency] = useState('THB'); // 'THB' or 'USD'
@@ -22,6 +26,46 @@ export default function App() {
   const [verifiedDoc, setVerifiedDoc] = useState(null);
   const [step, setStep] = useState(null); // 'vision-ai' | 'checkout' | null
   const [showLlmModal, setShowLlmModal] = useState(false);
+
+  // Make fleet readable to AG-UI Agent
+  useCopilotReadable({
+    description: "Current motorbike fleet inventory, rates, and deposit requirements at Mr. Pop Chiang Mai",
+    value: FLEET_DATA
+  });
+
+  // AG-UI Protocol Action: Calculate Price & Filter Fleet
+  useCopilotAction({
+    name: "calculateMotorbikeRentalPrice",
+    description: "Calculates total rental cost and filters motorbikes matching customer route, dates, or model request",
+    parameters: [
+      {
+        name: "vehicleName",
+        type: "string",
+        description: "Name of the requested bike (e.g. Honda Click 125cc, Triumph Scrambler 400X, Yamaha NMAX)",
+        required: true
+      },
+      {
+        name: "days",
+        type: "number",
+        description: "Total rental duration in days",
+        required: true
+      },
+      {
+        name: "category",
+        type: "string",
+        description: "Category: Adventure Bikes | Premium Scooters | City Scooters | Sports Bikes | Touring Accessories"
+      }
+    ],
+    handler: async ({ vehicleName, days, category }) => {
+      setQuery(`${vehicleName} for ${days} days`);
+      if (category) setActiveCategory(category);
+      const res = await queryFreeTierLlm(`${vehicleName} for ${days} days`);
+      if (res) {
+        setAiInterpretation(res.resolvedIntent + ' ' + (res.replyMessage || ''));
+      }
+      return `Price calculated for ${vehicleName} (${days} days): ฿${res?.totalPriceThb || 0} THB. Filter applied to UI.`;
+    }
+  });
 
   // AI-filtered fleet computation
   const filteredFleet = useMemo(() => {
@@ -66,10 +110,7 @@ export default function App() {
     }
 
     setIsAnalyzing(true);
-    
-    // Process query using free-tier LLM service or local date/price calculator
     const result = await queryFreeTierLlm(q);
-    
     setIsAnalyzing(false);
     
     if (result) {
@@ -183,7 +224,7 @@ export default function App() {
               Why Choose <span className="text-yellow-400">Mr. Pop Chiang Mai</span>
             </h3>
             <p className="text-xs sm:text-sm text-zinc-400">
-              Serving riders in Chiang Mai since 1956 — now enhanced with instant AI booking
+              Serving riders in Chiang Mai since 1956 — now enhanced with instant AG-UI Protocol
             </p>
           </div>
 
@@ -192,9 +233,9 @@ export default function App() {
               <div className="w-10 h-10 rounded-xl bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 flex items-center justify-center mb-3">
                 <Sparkles className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-white text-sm uppercase">Conversational AI Booking</h4>
+              <h4 className="font-bold text-white text-sm uppercase">AG-UI Protocol Agent</h4>
               <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                Describe your route or budget. Our AI matches your riding skill with the right bike in seconds.
+                Bi-directional event streaming protocols connecting agentic reasoning directly to UI state.
               </p>
             </div>
 
@@ -225,6 +266,15 @@ export default function App() {
       {/* Footer */}
       <Footer />
 
+      {/* AG-UI Protocol Copilot Popup Assistant */}
+      <CopilotPopup
+        instructions="You are Mr. Pop's AI Assistant. Help tourists calculate prices for motorbikes (Honda Click, Scrambler 400, NMAX, V-Strom) and guide them to rent in Chiang Mai."
+        labels={{
+          title: "Mr. Pop AG-UI Assistant",
+          initial: "Sawatdee krub! I'm Mr. Pop's AG-UI Agent. Ask me for bike rental quotes, dates, or route tips in Chiang Mai!"
+        }}
+      />
+
       {/* Modals */}
       {step === 'vision-ai' && selectedVehicle && (
         <VisionAiVerification
@@ -249,5 +299,13 @@ export default function App() {
       )}
 
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <CopilotKit publicApiKey="mrpop-chiangmai-demo-key">
+      <MrPopRentalApp />
+    </CopilotKit>
   );
 }
