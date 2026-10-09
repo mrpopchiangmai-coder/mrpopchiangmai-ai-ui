@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scan, CheckCircle2, ShieldCheck, Upload, AlertCircle, FileCheck, X, Sparkles, ArrowRight, Camera } from 'lucide-react';
+import { Scan, ShieldCheck, Upload, AlertCircle, FileCheck, X, Sparkles, ArrowRight } from 'lucide-react';
 
 export default function VisionAiVerification({ vehicle, currency, onClose, onVerified }) {
   const [isScanning, setIsScanning] = useState(false);
@@ -34,49 +34,49 @@ export default function VisionAiVerification({ vehicle, currency, onClose, onVer
           ' Helmets are mandatory for driver and pillion passenger in Thailand.',
           ' Keep to the LEFT side of the road in Chiang Mai.',
           ' Beware of Old City moat one-way traffic systems.',
-          ' 1,000 THB security deposit hold required at pickup.'
+          ' Refundable security deposit hold required at pickup.'
         ]
       });
     }, 2000);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-[#0d1322] border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-2xl bg-[#141414] border border-zinc-800 rounded-2xl shadow-2xl p-6 text-zinc-100 my-8">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+          className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
+          <div className="p-3 rounded-xl bg-yellow-400/10 border border-yellow-400/30 text-yellow-400">
             <Scan className="w-6 h-6 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-black text-white uppercase flex items-center gap-2">
               Vision AI Document Verification
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-normal">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/30 font-bold">
                 Step 1 of 2
               </span>
             </h2>
-            <p className="text-xs text-slate-400">
-              Reserving <span className="text-rose-300 font-semibold">{vehicle.name}</span> for {currency === 'THB' ? `฿${vehicle.priceThb}` : `$${vehicle.priceUsd}`}/day
+            <p className="text-xs text-zinc-400">
+              Reserving <span className="text-yellow-400 font-bold">{vehicle.name}</span> for {currency === 'THB' ? `฿${vehicle.priceThb}` : `$${vehicle.priceUsd}`}/day
             </p>
           </div>
         </div>
 
         {/* Instructions */}
-        <div className="mb-6 p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 space-y-2">
-          <div className="font-semibold text-rose-300 flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-amber-400" /> Fast Identity & Driving Permit Check
+        <div className="mb-6 p-4 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 space-y-2">
+          <div className="font-bold text-yellow-400 flex items-center gap-1.5 uppercase tracking-wider">
+            <Sparkles className="w-4 h-4 text-yellow-400" /> Fast Passport & Driving Permit Check
           </div>
-          <p>
-            Upload or drop a clear photo of your Passport, Driver's License, or International Driving Permit (IDP). Our Vision AI instantly checks age, document validity, and riding class eligibility.
+          <p className="text-zinc-400">
+            Upload or drop a clear photo of your Passport, Driver's License, or International Driving Permit (IDP). Our Vision AI instantly checks age, document validity, and riding class eligibility for Chiang Mai.
           </p>
         </div>
 
@@ -85,30 +85,30 @@ export default function VisionAiVerification({ vehicle, currency, onClose, onVer
           <div className="space-y-4">
             <div
               onClick={() => handleSimulatedScan(samplePassports[0])}
-              className="border-2 border-dashed border-slate-700 hover:border-rose-500/60 rounded-xl p-8 text-center bg-slate-900/40 hover:bg-slate-900/80 transition cursor-pointer group"
+              className="border-2 border-dashed border-zinc-700 hover:border-yellow-400 rounded-xl p-8 text-center bg-zinc-900/60 hover:bg-zinc-900 transition cursor-pointer group"
             >
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 group-hover:scale-110 transition">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-yellow-400/10 border border-yellow-400/30 flex items-center justify-center text-yellow-400 group-hover:scale-110 transition">
                 <Upload className="w-6 h-6" />
               </div>
-              <p className="text-sm font-bold text-white group-hover:text-rose-300 transition">
+              <p className="text-sm font-bold text-white group-hover:text-yellow-400 transition uppercase tracking-wider">
                 Click or Drop Document Image Here
               </p>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-zinc-400 mt-1">
                 Supports JPG, PNG, PDF up to 10MB (Passport, IDP, or Driving License)
               </p>
             </div>
 
             {/* Quick Demo Document Triggers */}
             <div className="pt-2">
-              <p className="text-xs text-slate-400 mb-2 font-medium">Or test instant Vision AI with sample documents:</p>
+              <p className="text-xs text-zinc-400 mb-2 font-bold uppercase tracking-wider">Or test instant Vision AI with sample documents:</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {samplePassports.map((doc, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSimulatedScan(doc)}
-                    className="p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-left text-xs text-slate-200 transition active:scale-95 flex items-center gap-2"
+                    className="p-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-yellow-400/50 text-left text-xs text-zinc-200 transition active:scale-95 flex items-center gap-2"
                   >
-                    <FileCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <FileCheck className="w-4 h-4 text-yellow-400 shrink-0" />
                     <span className="truncate">{doc.name}</span>
                   </button>
                 ))}
@@ -119,59 +119,59 @@ export default function VisionAiVerification({ vehicle, currency, onClose, onVer
 
         {/* Scanning Animation */}
         {isScanning && (
-          <div className="my-8 text-center p-8 bg-slate-900/80 rounded-xl border border-rose-500/30">
+          <div className="my-8 text-center p-8 bg-zinc-900 rounded-xl border border-yellow-400/30">
             <div className="relative w-16 h-16 mx-auto mb-4">
-              <div className="absolute inset-0 rounded-full border-4 border-rose-500/20"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-rose-500 border-t-transparent animate-spin"></div>
-              <Scan className="w-8 h-8 text-rose-400 absolute inset-0 m-auto animate-pulse" />
+              <div className="absolute inset-0 rounded-full border-4 border-yellow-400/20"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"></div>
+              <Scan className="w-8 h-8 text-yellow-400 absolute inset-0 m-auto animate-pulse" />
             </div>
-            <p className="text-sm font-bold text-white">Vision AI Analyzing {scannedDoc}...</p>
-            <p className="text-xs text-slate-400 mt-1">Extracting document OCR, verifying liveness & Chiang Mai driving eligibility...</p>
+            <p className="text-sm font-bold text-white uppercase">Vision AI Analyzing {scannedDoc}...</p>
+            <p className="text-xs text-zinc-400 mt-1">Extracting document OCR, verifying liveness & Chiang Mai driving eligibility...</p>
           </div>
         )}
 
         {/* Verification Success Results */}
         {scanResults && (
           <div className="space-y-4 animate-fadeIn">
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs">
+            <div className="p-4 rounded-xl bg-yellow-400/10 border border-yellow-400/30 text-xs">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-emerald-400 text-sm flex items-center gap-1.5">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" /> Document Identity Verified ({scanResults.confidence}% Confidence)
+                <span className="font-bold text-yellow-400 text-sm flex items-center gap-1.5 uppercase">
+                  <ShieldCheck className="w-5 h-5 text-yellow-400" /> Document Identity Verified ({scanResults.confidence}% Confidence)
                 </span>
-                <span className="text-[11px] font-mono text-emerald-300 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[11px] font-bold font-mono text-black bg-yellow-400 px-2 py-0.5 rounded uppercase">
                   {scanResults.status}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-slate-300 mt-3 pt-3 border-t border-emerald-500/20">
+              <div className="grid grid-cols-2 gap-2 text-zinc-300 mt-3 pt-3 border-t border-yellow-400/20">
                 <div>
-                  <span className="text-slate-500">Holder Name:</span>
+                  <span className="text-zinc-500">Holder Name:</span>
                   <p className="font-bold text-white">{scanResults.details.fullName}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Document No:</span>
+                  <span className="text-zinc-500">Document No:</span>
                   <p className="font-mono text-white">{scanResults.details.documentNo}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Eligibility Check:</span>
-                  <p className="font-semibold text-emerald-300">{scanResults.details.ageCheck}</p>
+                  <span className="text-zinc-500">Eligibility Check:</span>
+                  <p className="font-bold text-yellow-400">{scanResults.details.ageCheck}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">IDP Status:</span>
-                  <p className="font-semibold text-emerald-300">Valid International Driving Class</p>
+                  <span className="text-zinc-500">IDP Status:</span>
+                  <p className="font-bold text-yellow-400">Valid International Driving Class</p>
                 </div>
               </div>
             </div>
 
             {/* Local Guidance Box */}
-            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-slate-300 space-y-1.5">
-              <div className="font-bold text-amber-300 flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4 text-amber-400" /> Chiang Mai Driving Rules & Guidance:
+            <div className="p-3.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 space-y-1.5">
+              <div className="font-bold text-red-500 flex items-center gap-1.5 uppercase tracking-wider">
+                <AlertCircle className="w-4 h-4 text-red-500" /> Chiang Mai Driving Rules & Guidance:
               </div>
-              <ul className="space-y-1 pl-2 text-slate-300">
+              <ul className="space-y-1 pl-2 text-zinc-300">
                 {scanResults.localGuidance.map((rule, i) => (
                   <li key={i} className="flex items-start gap-1.5">
-                    <span className="text-amber-400 font-bold">•</span> {rule}
+                    <span className="text-yellow-400 font-bold">•</span> {rule}
                   </li>
                 ))}
               </ul>
@@ -181,16 +181,16 @@ export default function VisionAiVerification({ vehicle, currency, onClose, onVer
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={() => setScanResults(null)}
-                className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 transition"
+                className="px-4 py-2.5 rounded-xl bg-zinc-900 text-zinc-300 text-xs font-bold hover:bg-zinc-800 transition"
               >
-                Re-scan Document
+                Re-scan
               </button>
               <button
                 onClick={() => onVerified(scanResults)}
-                className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 transition active:scale-95"
+                className="flex-1 py-3 px-4 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-yellow-400/20 flex items-center justify-center gap-2 transition active:scale-95"
               >
                 <span>Proceed to E-Signature & PromptPay Checkout</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 stroke-[3]" />
               </button>
             </div>
           </div>

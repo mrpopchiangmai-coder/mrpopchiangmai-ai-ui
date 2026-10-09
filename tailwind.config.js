@@ -9,19 +9,22 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          accent: '#00f2fe',
+          yellow: '#FACC15', // Iconic Mr. Pop Yellow
+          yellowHover: '#EAB308',
+          red: '#DC2626',    // Mr. Pop Racing Red
+          redHover: '#B91C1C',
+          black: '#0A0A0A',  // Bold Black
+          500: '#FACC15',
+          600: '#EAB308',
+          700: '#CA8A04',
+          accent: '#FACC15',
           emerald: '#10b981',
         },
         dark: {
-          bg: '#0b0f19',
-          card: '#111827',
-          border: '#1f293d',
-          hover: '#1a233a',
+          bg: '#0A0A0A',
+          card: '#141414',
+          border: '#262626',
+          hover: '#1F1F1F',
         }
       },
     },
