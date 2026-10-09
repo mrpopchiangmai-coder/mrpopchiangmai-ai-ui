@@ -1,41 +1,28 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { CopilotRuntime, EmptyAdapter, copilotRuntimeNodeHttpEndpoint } from '@copilotkit/runtime';
 
-// Vite Plugin to serve local AG-UI Protocol Endpoint for CopilotKit
-function copilotKitLocalPlugin() {
+// Official CopilotRuntime Node Middleware for Vite Dev Server
+function copilotRuntimeVitePlugin() {
+  const serviceAdapter = new EmptyAdapter();
+  const runtime = new CopilotRuntime();
+
+  const handleCopilotRequest = copilotRuntimeNodeHttpEndpoint({
+    endpoint: '/api/copilotkit',
+    runtime,
+    serviceAdapter,
+  });
+
   return {
-    name: 'copilotkit-local-agent-endpoint',
+    name: 'copilotkit-runtime-vite-plugin',
     configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
-        if (req.url && req.url.includes('/api/copilotkit')) {
-          res.setHeader('Content-Type', 'application/json');
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          res.setHeader('Access-Control-Allow-Headers', '*');
-          res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-
-          if (req.method === 'OPTIONS') {
-            res.statusCode = 200;
-            res.end();
-            return;
-          }
-
-          // Return valid CopilotKit AG-UI runtime info & session response
-          res.statusCode = 200;
-          res.end(JSON.stringify({
-            status: "OK",
-            agent: "MrPopChiangMaiAgent",
-            version: "1.0.0",
-            actions: [],
-            messages: []
-          }));
-          return;
-        }
-        next();
+      server.middlewares.use('/api/copilotkit', (req, res, next) => {
+        handleCopilotRequest(req, res, next);
       });
-    }
+    },
   };
 }
 
 export default defineConfig({
-  plugins: [react(), copilotKitLocalPlugin()],
+  plugins: [react(), copilotRuntimeVitePlugin()],
 });
