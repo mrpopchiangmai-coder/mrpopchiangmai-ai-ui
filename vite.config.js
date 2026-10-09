@@ -16,8 +16,11 @@ function copilotRuntimeVitePlugin() {
   return {
     name: 'copilotkit-runtime-vite-plugin',
     configureServer(server) {
-      server.middlewares.use('/api/copilotkit', (req, res, next) => {
-        handleCopilotRequest(req, res, next);
+      server.middlewares.use((req, res, next) => {
+        if (req.url && req.url.startsWith('/api/copilotkit')) {
+          return handleCopilotRequest(req, res, next);
+        }
+        next();
       });
     },
   };
